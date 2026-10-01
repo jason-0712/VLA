@@ -99,3 +99,12 @@ archives are:
 
 Use `scripts/download_robotwin_assets.sh --download-only` first. Extract only
 after all three byte counts, SHA256 hashes, and ZIP integrity checks pass.
+
+The reference host completed extraction on 2026-10-01 under
+`/home/hanyu/VLA/work/RoboTwin/assets`. The extracted snapshot contains 11,000
+background-texture files, 229 embodiment files, and 9,368 object files. The
+three verified archives are retained alongside the extracted directories for
+recovery. The generated Aloha-AgileX `curobo_left.yml` and `curobo_right.yml`
+contain resolved absolute paths and no `${ASSETS_PATH}` placeholders. Both the
+competition repository and pinned RoboTwin checkout remained clean after
+extraction.
