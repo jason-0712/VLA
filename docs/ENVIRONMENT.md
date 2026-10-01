@@ -108,3 +108,18 @@ recovery. The generated Aloha-AgileX `curobo_left.yml` and `curobo_right.yml`
 contain resolved absolute paths and no `${ASSETS_PATH}` placeholders. Both the
 competition repository and pinned RoboTwin checkout remained clean after
 extraction.
+
+## Task-level RoboTwin smoke test
+
+The one-episode `beat_block_hammer` clean smoke test passed on 2026-10-01 with
+config `configs/competition/robotwin_smoke_clean.yml` at project commit
+`c7143e0`. Seed 0 was a normal planning failure and seed 1 succeeded. The
+successful trajectory contains 1,543 frames, four readable RGB observation
+streams, 14-D joint actions, and left/right end-effector poses. Its HDF5 file is
+83,217,903 bytes with SHA256
+`f769fd69889effc704d7298b931f9815a7bb1180917b380226b83904d93cdd46`.
+The generated 320 x 240 diagnostic video also contains 1,543 frames.
+
+The sm90 fused-LBFGS compatibility hook described in D-010 was enabled. The
+smoke output is infrastructure-only and must not enter the competition training
+manifest.
