@@ -63,6 +63,14 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Validation: all required imports, five Curobo CUDA extensions, a GPU operation, and a headless SAPIEN render smoke test passed.
 - Revisit when: RoboTwin or LingBot requires a different simulator revision.
 
+## D-009 - Pin and verify RoboTwin simulator assets
+
+- Date: 2026-10-01
+- Status: accepted
+- Decision: download the three required simulator asset archives from `TianxingChen/RoboTwin2.0` revision `3dc3b798668feb99ac61cc9086d84cbcc3d79186`, verify their exact sizes and SHA256 hashes, and separate download from extraction.
+- Reason: the upstream helper follows a mutable dataset `main`, immediately deletes archives after extraction, and does not record content hashes. Keeping verified archives until the first simulator validation makes provenance and recovery auditable.
+- Storage: keep simulator assets with the ignored RoboTwin checkout on the root filesystem; reserve `/mnt/data1` for raw and converted competition demonstrations.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

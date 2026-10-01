@@ -84,3 +84,18 @@ ROBOTWIN_ROOT=/path/to/pinned/RoboTwin bash scripts/verify_robotwin_env.sh
 ```
 
 Success ends with `ROBOTWIN_ENV_VALIDATION_OK`.
+
+## RoboTwin asset snapshot
+
+The first baseline series pins the `TianxingChen/RoboTwin2.0` dataset repository
+to revision `3dc3b798668feb99ac61cc9086d84cbcc3d79186`. The required simulator
+archives are:
+
+| Archive | Bytes | SHA256 |
+| --- | ---: | --- |
+| `background_texture.zip` | 10,970,687,027 | `54ede0fb5b783e0faa2bc98720d3affd6ca3bb9280b225b48c1aafaf31473070` |
+| `embodiments.zip` | 219,847,741 | `85ffeff55a5066def5931224a85cfa3f8abaa1fbf779bd17789a7fb3f85bc789` |
+| `objects.zip` | 3,737,778,549 | `6aa56b3cf1e1064f7c809308144da36b00815f8b137fef2d7e4de856f8becf27` |
+
+Use `scripts/download_robotwin_assets.sh --download-only` first. Extract only
+after all three byte counts, SHA256 hashes, and ZIP integrity checks pass.
