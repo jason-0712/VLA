@@ -46,6 +46,14 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Reason: the upstream code already exposes `train_expert_only`, making these the cheapest causal probes of representation degradation.
 - Revisit when: the first full clean-only baseline and representation-drift measurements are available.
 
+## D-007 - Reference environment and CUDA device ordering
+
+- Date: 2026-10-01
+- Status: accepted
+- Decision: use the official `lingbotvla` environment with Python 3.12, PyTorch 2.8.0+cu128, and FlashAttention 2.8.3; set `CUDA_DEVICE_ORDER=PCI_BUS_ID` in competition launchers.
+- Reason: all four H100s and an actual FlashAttention kernel passed validation. The host mixes approximately 80 GiB and 96 GiB H100 variants, and PyTorch's default enumeration did not match `nvidia-smi` ordering.
+- Revisit when: the pinned upstream environment changes or the execution host changes.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

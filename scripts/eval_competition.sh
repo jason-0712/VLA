@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Keep CUDA indices aligned with nvidia-smi PCI bus ordering.
+export CUDA_DEVICE_ORDER="${CUDA_DEVICE_ORDER:-PCI_BUS_ID}"
+
 usage() {
   cat <<'EOF'
 Usage: scripts/eval_competition.sh {clean|randomized|all}
