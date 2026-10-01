@@ -71,6 +71,15 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Reason: the upstream helper follows a mutable dataset `main`, immediately deletes archives after extraction, and does not record content hashes. Keeping verified archives until the first simulator validation makes provenance and recovery auditable.
 - Storage: keep simulator assets with the ignored RoboTwin checkout on the root filesystem; reserve `/mnt/data1` for raw and converted competition demonstrations.
 
+## D-010 - Disable the fused Curobo LBFGS kernel on Hopper
+
+- Date: 2026-10-01
+- Status: accepted
+- Decision: on compute capability 9.0, keep the Curobo LBFGS optimizer but disable its fused CUDA implementation through an opt-in Python startup hook. Do not modify the pinned RoboTwin or Curobo checkout.
+- Reason: the first task-level smoke test failed deterministically in `lbfgs_step_cu.forward` with CUDA error 715. A synchronous single-seed trace isolated the failure to `MotionGen.warmup()`. RoboTwin issue #452 documents the same failure for the same PyTorch/CUDA/Curobo stack on an H800 and the same fallback; the local minimal warmup passed with the fused implementation disabled.
+- Scope: infrastructure compatibility only. The fallback is enabled by `scripts/run_robotwin_clean_smoke.sh` after detecting capability 9.0 and must also be applied consistently to any expert-planning path on this host.
+- Revisit when: Curobo ships a validated sm90 fused-kernel fix, or the execution GPU is not Hopper.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.
