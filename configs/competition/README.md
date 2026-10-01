@@ -2,13 +2,17 @@
 
 This directory will contain immutable configuration snapshots for executed competition runs.
 
+`robotwin_smoke_clean.yml` is an infrastructure-only, one-episode simulator
+check. It is not a training configuration and its output must not be added to
+the competition training manifest.
+
 Naming convention:
 
 ```text
 E###_<method>_<scope>_<seed>.yaml
 ```
 
-The first runnable config is created only after:
+The first runnable training config is created only after:
 
 1. the clean-only data manifest and normalization statistics are verified;
 2. model/teacher/checkpoint paths are known;
