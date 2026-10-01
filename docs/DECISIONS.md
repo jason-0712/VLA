@@ -54,6 +54,15 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Reason: all four H100s and an actual FlashAttention kernel passed validation. The host mixes approximately 80 GiB and 96 GiB H100 variants, and PyTorch's default enumeration did not match `nvidia-smi` ordering.
 - Revisit when: the pinned upstream environment changes or the execution host changes.
 
+## D-008 - Isolate and pin the RoboTwin simulation stack
+
+- Date: 2026-10-01
+- Status: accepted
+- Decision: use a separate `RoboTwin` Conda environment with Python 3.10, PyTorch 2.4.1+cu121, a Conda-local CUDA 12.1 toolkit, GCC/G++ 11.4, and Curobo v0.7.8 at `d64c4b005459db10c5dd867d8b30a87d5bda9bdb`.
+- Reason: the pinned simulator stack is incompatible with the LingBot training environment, and Curobo requires `nvcc` to compile its CUDA extensions. Keeping the compiler in Conda avoids modifying the shared host installation.
+- Validation: all required imports, five Curobo CUDA extensions, a GPU operation, and a headless SAPIEN render smoke test passed.
+- Revisit when: RoboTwin or LingBot requires a different simulator revision.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

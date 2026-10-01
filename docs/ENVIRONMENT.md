@@ -53,3 +53,34 @@ installs LeRobot and local depth packages with `--no-deps`. Consequently,
 and related pins. The installer labels these as warnings. Treat runtime import
 or kernel failures as blockers; do not independently upgrade one of these
 packages without recording a new environment decision and rerunning validation.
+
+## Reference RoboTwin simulation environment
+
+Validated on 2026-10-01 against RoboTwin commit
+`13c3c47ff4312dd62484bcd51be034af55c062d1`.
+
+- Conda environment: `RoboTwin`
+- Python: 3.10.21
+- PyTorch: 2.4.1+cu121
+- CUDA toolkit and runtime: 12.1
+- Conda GCC/G++: 11.4
+- SAPIEN: 3.0.0b1
+- MPLib: 0.2.1
+- Open3D: 0.18.0
+- PyTorch3D: 0.7.8
+- Curobo tag: v0.7.8
+- Curobo commit: `d64c4b005459db10c5dd867d8b30a87d5bda9bdb`
+- Warp: 1.12.0
+
+The Curobo CUDA extensions were compiled for Hopper (`TORCH_CUDA_ARCH_LIST=9.0`).
+All five compiled extensions imported successfully, a CUDA tensor operation ran,
+and the pinned RoboTwin `script/test_render.py` reported `Render Well` on the
+headless reference host.
+
+After activating the simulation environment, run:
+
+```bash
+ROBOTWIN_ROOT=/path/to/pinned/RoboTwin bash scripts/verify_robotwin_env.sh
+```
+
+Success ends with `ROBOTWIN_ENV_VALIDATION_OK`.
