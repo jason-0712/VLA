@@ -89,8 +89,29 @@ The MoGe snapshot was downloaded and validated separately:
 - LFS content verified by SHA256: 419,110,160 bytes
 
 The base, Qwen3-VL, MoGe, LingBot-Depth, and DINO-Video model assets are now
-present and content-verified. This does not replace the model-load and
-one-batch forward/loss verification gates.
+present and content-verified.
+
+### FP32 model-load smoke
+
+The strict single-GPU load smoke passed on 2026-10-02 using
+`scripts/verify_lingbot_model_load.sh` and GPU 0 (96 GiB H100). The verifier
+constructed the full RoboTwin model from the pinned upstream config, loaded all
+six base-model shards through LingBot's post-training weight mapper, and found:
+
+- model class: `LingbotVlaV2Policy`
+- parameters: 6,375,906,359 total and trainable
+- parameter tensors: 1,672, all CUDA FP32 with none left on `meta`
+- action/state dimensions: 55/55
+- action-expert MoE: 36 layers, 32 experts, top-4 routing
+- load time: 7.423 seconds
+- resident allocation: 25,671,997,440 bytes (23.91 GiB)
+- peak allocation: 27,228,084,224 bytes (25.36 GiB)
+
+The immutable machine-readable record is outside Git at
+`/home/hanyu/lingbot-vla-results/model_load_smoke/fp32_gpu0_20261002T110440.json`.
+The load-only scope did not execute a forward pass or training. The next model
+gate remains a deterministic one-batch forward/loss pass after clean data
+validation.
 
 ## Reference RoboTwin simulation environment
 

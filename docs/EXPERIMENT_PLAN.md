@@ -1,6 +1,6 @@
 # Experiment Plan
 
-Last updated: 2026-10-01
+Last updated: 2026-10-02
 
 ## 1. Goal and research question
 
@@ -68,6 +68,9 @@ Gate: written rule matrix with allowed, forbidden, and unresolved techniques.
 
 - Build separate LingBot and RoboTwin environments.
 - Download base model and required Qwen3-VL, MoGe/LingBot-Depth, and DINO-Video teacher assets.
+- Strictly load the full 6.376B-parameter model in single-GPU FP32 and verify
+  architecture dimensions, dtype, device placement, and peak memory. Completed
+  2026-10-02; see `docs/ENVIRONMENT.md`.
 - Acquire only the required clean demonstrations for training.
 - Convert HDF5 to LeRobot v2.1, verify 50 x 50 episodes, and compute clean-only normalization statistics.
 - Record hashes and a storage estimate before conversion.
