@@ -182,3 +182,19 @@ The generated 320 x 240 diagnostic video also contains 1,543 frames.
 The sm90 fused-LBFGS compatibility hook described in D-010 was enabled. The
 smoke output is infrastructure-only and must not enter the competition training
 manifest.
+
+## LeRobot conversion environment
+
+RoboTwin's `policy/pi0/uv.lock` pins LeRobot 0.1.0 at commit
+`a445d9c9da6bea99a8972daa4fe1fdd053d711d2`, whose dataset code reports v2.1.
+The RoboTwin simulation environment has no LeRobot installation, while the
+LingBot environment contains the newer LeRobot 0.4.2 API. To avoid modifying
+either core environment, data conversion uses an isolated venv layered on the
+validated LingBot Python and places the pinned source first on `PYTHONPATH`.
+
+The setup is reproducible with `scripts/setup_lerobot_conversion_env.sh`; its
+import check asserts that `lerobot.__file__` belongs to the pinned checkout and
+that `CODEBASE_VERSION == "v2.1"`. The small additional packages are pinned to
+the RoboTwin lock where applicable: Draccus 0.10.0, DeepDiff 8.1.1, Tyro 0.9.5,
+and Termcolor 2.5.0. This environment is for conversion/audit only, not LingBot
+training or RoboTwin simulation.

@@ -97,6 +97,24 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Reason: this selection yields exactly 50 tasks and 23,780,715,316 bytes. The upstream LingBot `assets/training_data/robotwin.txt` is invalid for this competition because its 99 entries include 50 randomized datasets and one clean Piper dataset.
 - Validation order: validate one `beat_block_hammer` archive and its episode schema first, then acquire and audit all 50 tasks before conversion.
 
+## D-013 - Make the official LeRobot conversion deterministic
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: use RoboTwin's pinned LeRobot `a445d9c9da6bea99a8972daa4fe1fdd053d711d2` and its v2.1 image-mode conversion functions, while externally enforcing numeric episode order and NumPy seed 0 for `seen` instruction selection.
+- Reason: the upstream converter collects HDF5 files with unsorted `os.walk` and calls `np.random.choice` without a seed. Both affect episode/prompt provenance without changing the intended data recipe.
+- Validation: the one-task result has 50 episodes, 5,682 frames, exact state/action equality, 17,046/17,046 exact image matches, deterministic prompt reproduction, and a successful pinned-reader load.
+- Constraint: do not change image mode, FPS metadata, instruction split, action shift, camera set, or resolution during the baseline series without a new decision.
+
+## D-014 - Measure storage before full clean-data acquisition
+
+- Date: 2026-10-02
+- Status: provisional
+- Decision: pause the remaining 49-task acquisition until a storage layout is chosen from measured conversion sizes; next validate the LingBot training-side loader using the completed one-task dataset.
+- Reason: the measured image-mode LeRobot/source ratio is 5.47x. A proportional 50-task projection is about 130.1 GB for LeRobot alone and 239.5 GB while source, raw, processed, and LeRobot stages coexist, exceeding the current `/mnt/data1` free space.
+- Supersedes: the bulk-acquisition ordering implied by D-012; one-task conversion is now validated before acquiring the remaining tasks.
+- Revisit when: the one-task LingBot loader passes and root/data-volume allocation plus intermediate-retention policy are fixed.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.
