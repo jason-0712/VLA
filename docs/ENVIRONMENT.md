@@ -54,6 +54,23 @@ and related pins. The installer labels these as warnings. Treat runtime import
 or kernel failures as blockers; do not independently upgrade one of these
 packages without recording a new environment decision and rerunning validation.
 
+## Pinned model snapshots
+
+The reference host validated the base snapshot on 2026-10-02:
+
+- Repository: `robbyant/lingbot-vla-v2-6b`
+- Revision: `11c703bf6a5c1f45b3b69168482da11fdbba53d7`
+- Location: `/home/hanyu/VLA/work/models/lingbot-vla-v2-6b`
+- Files: 23, totaling 28,239,981,618 bytes
+- LFS content verified by SHA256: 28,236,983,562 bytes
+- Weight structure: 6 readable safetensors shards and 1,708 indexed tensors
+- Bundled teachers: `depth/model.pt` and
+  `dino_video/teacher_step_10000.pth` with its config
+
+Use `scripts/download_lingbot_model_assets.sh` for pinned, resumable downloads.
+Qwen3-VL and MoGe dependency snapshots are recorded in D-011 but remain a
+separate verification step.
+
 ## Reference RoboTwin simulation environment
 
 Validated on 2026-10-01 against RoboTwin commit
