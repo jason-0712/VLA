@@ -142,6 +142,15 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Validation: one-task clean statistics contain exactly the four expected 12-D arm and 2-D effector state/action entries with state count 5,682. A full processed batch passed with state `[1,55]`, actions `[1,50,55]`, three cameras, 72 language tokens, finite values, and active indices `[0..11,28,29]`.
 - Constraint: the one-task statistics are valid only for loader smoke and one-task overfit. Recompute and hash a single all-50-task clean-only statistics file before any short or full 50-task training run.
 
+## D-018 - Validate the core VLA loss before enabling auxiliary teachers
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: split the first GPU loss check into two sub-gates. First load the complete official model topology and weights, then disable only auxiliary alignment-loss dispatch after construction and validate the core flow-matching VLA loss in FP32. Validate the depth/video teacher target and loss path separately before any optimizer step.
+- Reason: this isolates the already audited clean batch, model input contract, action masks, MoE routing losses, and primary action objective from three additional teacher pipelines. The first sub-gate passed with no optimizer, backward pass, or checkpoint write. It is not evidence that the complete official training loss works.
+- Numerical note: fixed-input repeats with the official `robby_moe_forward` inference kernel are not bitwise deterministic. Keeping the same fused checkpoint layout but disabling only that fast kernel made all three forward losses bitwise identical, localizing the observed jitter to the fast MoE inference path or its interaction with the model. The default official kernel remains the reference path; the fallback is diagnostic only and must be recorded if used.
+- Next gate: run the complete auxiliary teacher/target forward in FP32, then one minimal backward/optimizer/checkpoint-export-and-reload check before evaluation or overfit training.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

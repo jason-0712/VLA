@@ -224,5 +224,7 @@ Full-batch audit:
 
 The one-task statistics are not valid for the 50-task baseline. Recompute one
 clean-only statistics file from the final 50-task manifest after acquisition.
-The next functional gate is one deterministic GPU forward/loss using this
-batch, with no optimizer step.
+The teacher-free core-VLA GPU forward/loss passed using this exact batch and
+the recorded manifest/statistics hashes. The next functional gate is the
+complete official auxiliary depth/video teacher-target forward; it must still
+use this immutable clean batch and must not yet start a training run.

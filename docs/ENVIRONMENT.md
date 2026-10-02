@@ -109,9 +109,51 @@ six base-model shards through LingBot's post-training weight mapper, and found:
 
 The immutable machine-readable record is outside Git at
 `/home/hanyu/lingbot-vla-results/model_load_smoke/fp32_gpu0_20261002T110440.json`.
-The load-only scope did not execute a forward pass or training. The next model
-gate remains a deterministic one-batch forward/loss pass after clean data
-validation.
+The load-only scope did not execute a forward pass or training.
+
+### Core VLA FP32 forward/loss smoke
+
+The first GPU loss sub-gate passed on 2026-10-02 using
+`scripts/verify_lingbot_forward_loss.sh` on one 80 GiB H100. The verifier loaded
+the full official model topology and weights, then disabled auxiliary
+depth/video loss dispatch after construction so the audited clean batch could
+exercise the primary flow-matching action objective in isolation. It used
+explicit seed-42 noise, flow time 0.5, evaluation mode, and FP32 throughout.
+
+Official fused-MoE result:
+
+- batch: state `[1,55]`, actions `[1,50,55]`, images `[1,3,256,1536]`
+- parameters: 6,375,906,359 across 1,672 CUDA FP32 tensors
+- total loss: `0.2718366683`
+- VLA loss: `0.2707217336`
+- sequence-wise/router losses: `0.0010838973` / `0.0000310292`
+- model load: 5.210 seconds
+- cold/warm/warm forwards: 1.437 / 0.266 / 0.262 seconds
+- allocation after load: 25,676,222,464 bytes (23.91 GiB)
+- peak forward allocation: 25,852,809,728 bytes (24.08 GiB)
+- gradients, optimizer, backward, checkpoint writes: none
+
+The immutable audit is:
+
+```text
+/home/hanyu/lingbot-vla-results/forward_loss_smoke/core_fp32_20261002T141224/audit.json
+SHA256 f26a4f449babc9cc74c11e4b26b1d5423208b9fdecfff453b57b8b74c7fec879
+```
+
+The official `robby_moe_forward` fast inference kernel is not bitwise
+deterministic for fixed inputs: the two warm total losses differed by
+`0.0011662543`. A diagnostic kept the same fused checkpoint layout but disabled
+only that kernel, causing the cold and both warm losses to match exactly at
+`0.2706921995`. Its audit is:
+
+```text
+/home/hanyu/lingbot-vla-results/forward_loss_smoke/core_fp32_20261002T141250/audit.json
+SHA256 5324a41a1ebcc10a3a67697c327af00a3cfc51d6ede2cdcbe39dffbf9b975384
+```
+
+This fallback is diagnostic, not the reference configuration. The core smoke
+does not validate the auxiliary teacher losses, gradients, optimizer state, or
+checkpoint export. Those remain the next open-loop sub-gates.
 
 ## Reference RoboTwin simulation environment
 
@@ -204,5 +246,5 @@ pinned LingBot code deliberately supports the v2 API as a fallback. Loader
 wrappers therefore require `LEROBOT_V2_ROOT` and `LEROBOT_V2_ENV`, prepend the
 pinned source on `PYTHONPATH`, and record the imported source file and commit.
 This does not modify the LingBot or RoboTwin environments. Its use for an actual
-training forward/optimizer path remains gated on the one-batch forward/loss
-check.
+training optimizer path remains gated on the complete auxiliary-loss and
+backward/export checks.

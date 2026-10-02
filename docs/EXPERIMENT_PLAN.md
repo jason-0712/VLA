@@ -80,10 +80,22 @@ The one-task source, conversion, and training-loader gates for
 50 raw episodes, deterministic LeRobot v2.1 conversion, clean-only
 normalization, and the complete 55-D LingBot CPU batch were validated. The
 storage layout is now fixed across the Mac, `/mnt/data1` staging, and the server
-root filesystem. The next sub-gate is one deterministic model forward/loss on
-this batch; it must not perform an optimizer step.
+root filesystem.
 
-Gate: deterministic one-batch dataloader and forward/loss pass; no randomized path in the training manifest.
+The teacher-free core-VLA FP32 forward/loss sub-gate also passed on 2026-10-02
+with the complete official model topology and fixed explicit noise/time. The
+official fused MoE path produced finite, decomposable losses and required about
+24.08 GiB peak allocated memory. A diagnostic localized small fixed-input
+repeat jitter to the `robby_moe_forward` fast inference kernel. No optimizer,
+backward pass, or checkpoint write occurred.
+
+The next sub-gate is the complete official auxiliary depth/video teacher-target
+forward. After that, execute one minimal backward/optimizer step and export/reload
+a checkpoint. Do not call Phase 1 complete or start training until those checks
+pass.
+
+Gate: one-batch official loss and checkpoint export/reload pass; no randomized
+path in the training manifest.
 
 ### Phase 2 - Evaluation pipeline validation (Oct 3-5)
 
