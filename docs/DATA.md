@@ -143,8 +143,32 @@ tasks would require approximately 33.1 GB raw, 52.5 GB processed HDF5, and
 130.1 GB LeRobot, or about 239.5 GB while all four stages coexist. Even keeping
 only source ZIPs plus LeRobot would be about 153.9 GB. `/mnt/data1` had about
 140 GB free at this gate, so the full acquisition must use staged conversion
-and a revised cross-filesystem storage layout. Do not launch all-task download
-until that layout is fixed.
+and a revised cross-filesystem storage layout.
+
+### Mac source-backup validation and retention layout
+
+An independent Mac download of `beat_block_hammer` passed on 2026-10-02 using
+`huggingface-hub==0.34.0`. Its 229,401,324 bytes, 207 ZIP members, 319,531,834
+uncompressed member bytes, ZIP CRC, and SHA256
+`a135ad233bdcffff65fb636780f95ec34abc36ccf2bd0ff26ab07c9c464cc6af` exactly
+match the server copy. The immutable local audit is stored outside Git at:
+
+```text
+${CLEAN_DATA_ROOT}/audits/clean_download_task_beat_block_hammer_20261002T132131.json
+```
+
+The retained layout for the full dataset is:
+
+- Mac `CLEAN_DATA_ROOT`: immutable original clean ZIPs and download audits
+- server `/mnt/data1`: one-task source/raw/processed conversion staging
+- server root filesystem: audited LeRobot v2.1 training datasets
+- Git: manifests, scripts, hashes, and decisions only; never data or checkpoints
+
+After a task's source SHA256 and final LeRobot tree hash are recorded, its
+server-side source/raw/processed staging copies may be removed. The Mac source
+archive is retained unchanged so every derived artifact remains reproducible.
+Do not bulk-download the remaining 49 tasks until the one-task LingBot loader
+gate passes.
 
 The next functional gate is to open this one-task dataset through LingBot's
 actual training-side data loader. That verifies v2.1 compatibility and the

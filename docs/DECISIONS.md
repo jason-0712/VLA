@@ -115,6 +115,15 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Supersedes: the bulk-acquisition ordering implied by D-012; one-task conversion is now validated before acquiring the remaining tasks.
 - Revisit when: the one-task LingBot loader passes and root/data-volume allocation plus intermediate-retention policy are fixed.
 
+## D-015 - Keep source archives on the Mac and stage conversion per task
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: keep the immutable 23.78 GB clean source-archive set on the Mac under an external `CLEAN_DATA_ROOT`; on the server, stage one task at a time on `/mnt/data1` and keep only the audited LeRobot output on the root filesystem. Remove a task's server-side source/raw/processed staging copies only after the Mac ZIP hash and final LeRobot tree hash are recorded. Derived LeRobot data remains reproducible from the pinned ZIPs and conversion code.
+- Reason: the Mac has 234 GiB available, while `/mnt/data1` has only 138 GiB available. The projected all-task LeRobot output is about 130.1 GB and all conversion stages together are about 239.5 GB, so retaining every stage on `/mnt/data1` is not viable. The server root has 218 GiB available for the final training dataset.
+- Validation: `beat_block_hammer` was downloaded independently on the Mac, passed ZIP CRC, and produced SHA256 `a135ad233bdcffff65fb636780f95ec34abc36ccf2bd0ff26ab07c9c464cc6af`, exactly matching the server copy.
+- Supersedes: the storage allocation in D-011 and resolves the layout decision requested by D-014. The one-task LingBot loader remains the next functional gate before bulk acquisition.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.
