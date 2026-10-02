@@ -79,7 +79,18 @@ than duplicated:
 - Weight structure: 2 readable safetensors shards and 713 indexed tensors
 
 All Qwen file sizes and LFS SHA256 hashes were revalidated on 2026-10-02.
-MoGe remains a separate verification step.
+
+The MoGe snapshot was downloaded and validated separately:
+
+- Repository: `Ruicheng/moge-2-vitb-normal`
+- Revision: `ca5f0e07ff01d3e5a364c1d954ed12ee1814b368`
+- Location: `/home/hanyu/VLA/work/models/moge-2-vitb-normal`
+- Files: 3, totaling 419,111,765 bytes
+- LFS content verified by SHA256: 419,110,160 bytes
+
+The base, Qwen3-VL, MoGe, LingBot-Depth, and DINO-Video model assets are now
+present and content-verified. This does not replace the model-load and
+one-batch forward/loss verification gates.
 
 ## Reference RoboTwin simulation environment
 
