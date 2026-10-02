@@ -40,6 +40,47 @@ The `beat_block_hammer` source archive passed on 2026-10-02:
 - immutable audit:
   `/mnt/data1/hanyu/lingbot_vla/audits/clean_download_task_beat_block_hammer_20261002T111318.json`
 
-This gate is download/structure validation only. The archive remains unchanged
-and has not yet been extracted or converted. The next gate is safe extraction
-to a separate raw directory followed by an episode-level HDF5 schema audit.
+The source archive remains unchanged. It was subsequently extracted using
+`scripts/extract_competition_clean_data.sh`, which rejects path traversal and
+symlink members, stages the extraction, and atomically installs it without
+overwriting existing raw data. The extraction audit is:
+
+```text
+/mnt/data1/hanyu/lingbot_vla/audits/clean_extract_beat_block_hammer_20261002T113759.json
+```
+
+## First task-level episode audit
+
+All 50 extracted `beat_block_hammer` episodes passed
+`scripts/audit_competition_raw_data.py` on 2026-10-02:
+
+- 50 unique source seeds and 50 clean scene metadata entries
+- 5,732 raw frames; 109–126 frames per episode, mean 114.64
+- 14-D raw joint vectors exactly equal left arm/gripper plus right
+  arm/gripper concatenation (maximum absolute error 0)
+- 1,100,544 numeric values checked with zero NaN/Inf values
+- 22,928 encoded images decoded across four cameras, all 320 x 240 x 3
+- all 50 diagnostic MP4 frame counts match their HDF5 episode lengths
+- every episode has 100 `seen` and 100 `unseen` instructions
+- official training inputs map head/left/right cameras to
+  `cam_high`/`cam_left_wrist`/`cam_right_wrist`; the front camera is not used
+- trajectory pickle files were checked for presence and size but deliberately
+  not deserialized; the official conversion path reads the HDF5 files
+
+The raw HDF5 files contain no explicit timestamp field. The pinned official
+converter aligns samples by index as `state[t] -> action[t+1]`, dropping one
+frame per episode, so the expected one-task LeRobot output is 5,682 frames.
+Diagnostic MP4 files report 30 FPS while the official LeRobot converter writes
+50 FPS metadata; the converter reads HDF5 frames rather than the MP4 files. Keep
+the upstream 50 FPS behavior for the reproduction baseline and record this
+fact instead of inferring control timing from diagnostic video metadata.
+
+The immutable full audit, including per-episode rows and numeric ranges, is:
+
+```text
+/mnt/data1/hanyu/lingbot_vla/audits/raw_episode_audit_beat_block_hammer_20261002T114242.json
+```
+
+The next gate is a one-task official raw-to-LeRobot conversion followed by a
+LeRobot metadata/frame audit. Do not acquire all 50 tasks until that conversion
+path is verified.

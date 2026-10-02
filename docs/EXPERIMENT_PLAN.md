@@ -75,6 +75,11 @@ Gate: written rule matrix with allowed, forbidden, and unresolved techniques.
 - Convert HDF5 to LeRobot v2.1, verify 50 x 50 episodes, and compute clean-only normalization statistics.
 - Record hashes and a storage estimate before conversion.
 
+The one-task source gate for `beat_block_hammer` passed on 2026-10-02: the
+pinned archive, safe extraction, and all 50 raw episodes were validated. The
+next sub-gate is one-task LeRobot conversion and frame-level validation before
+the remaining 49 source archives are acquired.
+
 Gate: deterministic one-batch dataloader and forward/loss pass; no randomized path in the training manifest.
 
 ### Phase 2 - Evaluation pipeline validation (Oct 3-5)
