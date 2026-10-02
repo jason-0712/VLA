@@ -89,6 +89,14 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Storage: store the 37.55 GB of model snapshots on the root filesystem under an ignored model root. Reserve `/mnt/data1` for the 23.78 GB of clean source archives plus extracted and converted datasets.
 - Constraint: `lingbot-vla-v2-6b-robotwin` remains infrastructure-only and is not a valid initialization for scored clean-only training.
 
+## D-012 - Build the clean manifest from pinned source archives
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: acquire only the 50 files matching `dataset/<task>/aloha-agilex_clean_50.zip` from `TianxingChen/RoboTwin2.0@3dc3b798668feb99ac61cc9086d84cbcc3d79186`; preserve the verified ZIPs unchanged and extract/convert into separate directories.
+- Reason: this selection yields exactly 50 tasks and 23,780,715,316 bytes. The upstream LingBot `assets/training_data/robotwin.txt` is invalid for this competition because its 99 entries include 50 randomized datasets and one clean Piper dataset.
+- Validation order: validate one `beat_block_hammer` archive and its episode schema first, then acquire and audit all 50 tasks before conversion.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.
