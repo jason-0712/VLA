@@ -68,8 +68,18 @@ The reference host validated the base snapshot on 2026-10-02:
   `dino_video/teacher_step_10000.pth` with its config
 
 Use `scripts/download_lingbot_model_assets.sh` for pinned, resumable downloads.
-Qwen3-VL and MoGe dependency snapshots are recorded in D-011 but remain a
-separate verification step.
+The existing Qwen3-VL snapshot from the StarVLA workspace was reused rather
+than duplicated:
+
+- Repository: `Qwen/Qwen3-VL-4B-Instruct`
+- Revision: `ebb281ec70b05090aa6165b016eac8ec08e71b17`
+- Location:
+  `/home/hanyu/starVLA/playground/Pretrained_models/Qwen3-VL-4B-Instruct`
+- Files: 14, totaling 8,887,292,732 bytes
+- Weight structure: 2 readable safetensors shards and 713 indexed tensors
+
+All Qwen file sizes and LFS SHA256 hashes were revalidated on 2026-10-02.
+MoGe remains a separate verification step.
 
 ## Reference RoboTwin simulation environment
 

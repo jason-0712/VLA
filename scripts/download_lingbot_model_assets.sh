@@ -3,7 +3,14 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: scripts/download_lingbot_model_assets.sh {--base-only|--dependencies-only|--all}
+Usage: scripts/download_lingbot_model_assets.sh MODE
+
+Modes:
+  --base-only
+  --qwen-only
+  --moge-only
+  --dependencies-only
+  --all
 
 Required environment:
   MODEL_ROOT  Destination directory for immutable model snapshots
@@ -19,7 +26,7 @@ EOF
 }
 
 case "$1" in
-  --base-only | --dependencies-only | --all) mode="$1" ;;
+  --base-only | --qwen-only | --moge-only | --dependencies-only | --all) mode="$1" ;;
   *)
     usage >&2
     exit 2
@@ -47,14 +54,14 @@ MODEL_SOURCES = (
         "directory": "lingbot-vla-v2-6b",
     },
     {
-        "group": "dependency",
+        "group": "qwen",
         "repo_id": "Qwen/Qwen3-VL-4B-Instruct",
         "revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
         "expected_bytes": 8_887_292_732,
         "directory": "Qwen3-VL-4B-Instruct",
     },
     {
-        "group": "dependency",
+        "group": "moge",
         "repo_id": "Ruicheng/moge-2-vitb-normal",
         "revision": "ca5f0e07ff01d3e5a364c1d954ed12ee1814b368",
         "expected_bytes": 419_111_765,
@@ -74,8 +81,10 @@ def sha256(path: Path) -> str:
 mode = os.environ["mode"]
 selected_groups = {
     "--base-only": {"base"},
-    "--dependencies-only": {"dependency"},
-    "--all": {"base", "dependency"},
+    "--qwen-only": {"qwen"},
+    "--moge-only": {"moge"},
+    "--dependencies-only": {"qwen", "moge"},
+    "--all": {"base", "qwen", "moge"},
 }[mode]
 model_root = Path(os.environ["MODEL_ROOT"]).resolve()
 api = HfApi()
