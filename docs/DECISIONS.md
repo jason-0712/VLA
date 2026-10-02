@@ -80,6 +80,15 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Scope: infrastructure compatibility only. The fallback is enabled by `scripts/run_robotwin_clean_smoke.sh` after detecting capability 9.0 and must also be applied consistently to any expert-planning path on this host.
 - Revisit when: Curobo ships a validated sm90 fused-kernel fix, or the execution GPU is not Hopper.
 
+## D-011 - Pin model snapshots and separate model/data storage
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: pin the base model to `robbyant/lingbot-vla-v2-6b@11c703bf6a5c1f45b3b69168482da11fdbba53d7`, Qwen3-VL to `Qwen/Qwen3-VL-4B-Instruct@ebb281ec70b05090aa6165b016eac8ec08e71b17`, and MoGe to `Ruicheng/moge-2-vitb-normal@ca5f0e07ff01d3e5a364c1d954ed12ee1814b368`.
+- Reason: upstream download helpers follow mutable repository heads. Exact revisions, repository byte totals, per-file sizes, and LFS SHA256 hashes must be checked before a model enters a run.
+- Storage: store the 37.55 GB of model snapshots on the root filesystem under an ignored model root. Reserve `/mnt/data1` for the 23.78 GB of clean source archives plus extracted and converted datasets.
+- Constraint: `lingbot-vla-v2-6b-robotwin` remains infrastructure-only and is not a valid initialization for scored clean-only training.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.
