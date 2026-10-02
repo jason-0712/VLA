@@ -170,6 +170,59 @@ archive is retained unchanged so every derived artifact remains reproducible.
 Do not bulk-download the remaining 49 tasks until the one-task LingBot loader
 gate passes.
 
-The next functional gate is to open this one-task dataset through LingBot's
-actual training-side data loader. That verifies v2.1 compatibility and the
-RoboTwin 14-D-to-unified mapping before spending storage on all 50 tasks.
+## LingBot training-side loader and clean normalization gate
+
+This gate passed on 2026-10-02. A first attempt with the LingBot environment's
+installed LeRobot 0.4.2 selected its v3 API and correctly rejected the v2.1
+dataset. No conversion was attempted. Placing pinned LeRobot commit
+`a445d9c9da6bea99a8972daa4fe1fdd053d711d2` first on `PYTHONPATH` selected
+LingBot's explicit v2 compatibility branch and preserved the audited dataset.
+
+The raw loader opened all 50 episodes and 5,682 frames. Samples 0, 124, 125,
+and 5,681 passed 20 exact tensor comparisons covering:
+
+- raw 14-D state/action to 12-D dual-arm plus 2-D effector splitting
+- 50-step action chunks
+- episode-boundary padding, including 49 padded steps at terminal frames
+- language task and robot-config identity
+
+Raw-loader audit:
+
+```text
+/home/hanyu/lingbot-vla-results/data_loader_smoke/raw_beat_block_hammer_20261002T134708/audit.json
+```
+
+The released `assets/norm_stats/robotwin.json` was not used because it belongs
+to the upstream clean-plus-randomized recipe. The official LingBot statistics
+script recomputed one-task clean-only statistics over the immutable manifest in
+10 minutes 31 seconds. It produced four entries (12-D arm and 2-D effector for
+state and action), state count 5,682, and SHA256:
+
+```text
+d87c011cc80d595bace02b3fec97a4555c54f84aae54a7dcfd05865780abc333
+```
+
+The pinned builder declares `data.norm_stats_file` but does not pass it into
+`FeatureTransform`. The verifier therefore generated an immutable runtime copy
+of `robotwin.yaml` with only its `norm_stats` value changed; the pinned LingBot
+checkout remained unmodified.
+
+The fully processed one-sample batch then passed with:
+
+- state shape `[1, 55]` and action shape `[1, 50, 55]`
+- 14 active dimensions at indices `[0..11, 28, 29]`; all other values zero
+- three active Qwen3-VL camera inputs, shape `[1, 3, 256, 1536]`
+- image-grid metadata `[1, 3, 3]` and language tokens `[1, 72]`
+- finite normalized state, action, and image tensors
+- manifest and normalization hashes recorded in the audit
+
+Full-batch audit:
+
+```text
+/home/hanyu/lingbot-vla-results/data_loader_smoke/full_beat_block_hammer_20261002T134627/audit.json
+```
+
+The one-task statistics are not valid for the 50-task baseline. Recompute one
+clean-only statistics file from the final 50-task manifest after acquisition.
+The next functional gate is one deterministic GPU forward/loss using this
+batch, with no optimizer step.

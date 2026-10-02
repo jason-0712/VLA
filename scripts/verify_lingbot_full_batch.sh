@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${LINGBOT_VLA_ROOT:?Set LINGBOT_VLA_ROOT to the pinned LingBot source checkout}"
+: "${LEROBOT_V2_ROOT:?Set LEROBOT_V2_ROOT to the pinned LeRobot v2 source checkout}"
+: "${LEROBOT_V2_ENV:?Set LEROBOT_V2_ENV to the isolated LeRobot v2 environment}"
+: "${TRAIN_DATASET_PATH:?Set TRAIN_DATASET_PATH to one audited clean LeRobot dataset}"
+: "${NORM_STATS_PATH:?Set NORM_STATS_PATH to clean-only normalization statistics}"
+: "${MODEL_PATH:?Set MODEL_PATH to the LingBot-VLA 2.0 base-model snapshot}"
+: "${QWEN3VL_PATH:?Set QWEN3VL_PATH to the Qwen3-VL-4B-Instruct snapshot}"
+: "${OUTPUT_BASE:?Set OUTPUT_BASE to an output directory outside Git}"
+
+lerobot_python="$LEROBOT_V2_ENV/bin/python"
+if [[ ! -x "$lerobot_python" ]]; then
+  echo "Missing LeRobot v2 Python interpreter: $lerobot_python" >&2
+  exit 2
+fi
+
+export PYTHONPATH="$LEROBOT_V2_ROOT:$LINGBOT_VLA_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+export HF_HUB_OFFLINE=1
+export HF_DATASETS_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export TOKENIZERS_PARALLELISM=false
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+exec "$lerobot_python" "$script_dir/verify_lingbot_full_batch.py"

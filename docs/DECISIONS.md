@@ -124,6 +124,24 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Validation: `beat_block_hammer` was downloaded independently on the Mac, passed ZIP CRC, and produced SHA256 `a135ad233bdcffff65fb636780f95ec34abc36ccf2bd0ff26ab07c9c464cc6af`, exactly matching the server copy.
 - Supersedes: the storage allocation in D-011 and resolves the layout decision requested by D-014. The one-task LingBot loader remains the next functional gate before bulk acquisition.
 
+## D-016 - Read official v2.1 data through LingBot's pinned v2 compatibility branch
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: keep the audited RoboTwin output in LeRobot v2.1 format and run LingBot data-loading commands with pinned LeRobot source `a445d9c9da6bea99a8972daa4fe1fdd053d711d2` first on `PYTHONPATH`, using the isolated v2 environment layered on the validated LingBot Python packages. Do not convert the baseline data to LeRobot v3.
+- Reason: the LingBot environment's installed LeRobot 0.4.2 reader rejects v2.1 datasets with `BackwardCompatibilityError`. The pinned LingBot source explicitly implements a v2 import fallback, and that branch loaded all 5,682 one-task frames without changing the already audited conversion output.
+- Provenance note: distribution metadata still reports installed LeRobot 0.4.2 because the isolated environment uses LingBot's system packages. Audits must record the imported `lerobot.__file__`, pinned source commit, selected LingBot API branch, and interpreter; package metadata alone is not sufficient.
+- Revisit when: the organizer or pinned upstream recipe requires v3, or a v3 conversion is proven byte/semantic-equivalent and adopted as a separately audited data version.
+
+## D-017 - Recompute normalization from clean-only data and inject it without patching upstream
+
+- Date: 2026-10-02
+- Status: accepted
+- Decision: compute `bounds_99_woclip` statistics with LingBot's official `scripts/compute_norm_stats.py` over the exact clean-only manifest. Generate an immutable runtime copy of `robotwin.yaml` whose only change is the `norm_stats` path; do not use upstream `assets/norm_stats/robotwin.json` and do not edit the pinned checkout.
+- Reason: the released statistics belong to the clean-plus-randomized training recipe and violate scored-model provenance. Although `MyDataArguments` exposes `norm_stats_file`, the pinned dataset builder does not pass it to `FeatureTransform`, so a runtime robot-config snapshot is currently the smallest auditable override.
+- Validation: one-task clean statistics contain exactly the four expected 12-D arm and 2-D effector state/action entries with state count 5,682. A full processed batch passed with state `[1,55]`, actions `[1,50,55]`, three cameras, 72 language tokens, finite values, and active indices `[0..11,28,29]`.
+- Constraint: the one-task statistics are valid only for loader smoke and one-task overfit. Recompute and hash a single all-50-task clean-only statistics file before any short or full 50-task training run.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

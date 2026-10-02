@@ -75,12 +75,13 @@ Gate: written rule matrix with allowed, forbidden, and unresolved techniques.
 - Convert HDF5 to LeRobot v2.1, verify 50 x 50 episodes, and compute clean-only normalization statistics.
 - Record hashes and a storage estimate before conversion.
 
-The one-task source and conversion gates for `beat_block_hammer` passed on
-2026-10-02: the pinned archive, safe extraction, 50 raw episodes, deterministic
-LeRobot v2.1 conversion, and all converted states/actions/images were
-validated. The next sub-gate is a LingBot training-side loader batch. Full
-acquisition remains paused because measured image-mode storage expansion does
-not fit all source/intermediate/final stages on `/mnt/data1` simultaneously.
+The one-task source, conversion, and training-loader gates for
+`beat_block_hammer` passed on 2026-10-02: the pinned archive, safe extraction,
+50 raw episodes, deterministic LeRobot v2.1 conversion, clean-only
+normalization, and the complete 55-D LingBot CPU batch were validated. The
+storage layout is now fixed across the Mac, `/mnt/data1` staging, and the server
+root filesystem. The next sub-gate is one deterministic model forward/loss on
+this batch; it must not perform an optimizer step.
 
 Gate: deterministic one-batch dataloader and forward/loss pass; no randomized path in the training manifest.
 

@@ -196,5 +196,13 @@ The setup is reproducible with `scripts/setup_lerobot_conversion_env.sh`; its
 import check asserts that `lerobot.__file__` belongs to the pinned checkout and
 that `CODEBASE_VERSION == "v2.1"`. The small additional packages are pinned to
 the RoboTwin lock where applicable: Draccus 0.10.0, DeepDiff 8.1.1, Tyro 0.9.5,
-and Termcolor 2.5.0. This environment is for conversion/audit only, not LingBot
-training or RoboTwin simulation.
+and Termcolor 2.5.0.
+
+The same interpreter/source overlay is required for LingBot data loading. The
+installed LeRobot 0.4.2 v3 reader rejects the official v2.1 dataset, while the
+pinned LingBot code deliberately supports the v2 API as a fallback. Loader
+wrappers therefore require `LEROBOT_V2_ROOT` and `LEROBOT_V2_ENV`, prepend the
+pinned source on `PYTHONPATH`, and record the imported source file and commit.
+This does not modify the LingBot or RoboTwin environments. Its use for an actual
+training forward/optimizer path remains gated on the one-batch forward/loss
+check.

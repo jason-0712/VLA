@@ -20,6 +20,7 @@ Any ambiguity about image augmentation, synthetic perturbation, external data, o
 
 - LingBot-VLA 2.0: `Robbyant/lingbot-vla-v2` commit `be969b8fd117fb70550c5d4bf4bc328211b5b1b6` (observed 2026-10-01).
 - RoboTwin 2.0: commit `13c3c47ff4312dd62484bcd51be034af55c062d1`, the revision specified by the LingBot RoboTwin setup guide.
+- LeRobot v2 reader/converter: commit `a445d9c9da6bea99a8972daa4fe1fdd053d711d2`, the revision locked by RoboTwin 2.0 and reporting dataset codebase v2.1.
 
 Record any later upstream update as a new decision. Do not silently move either pin during an experiment series.
 
@@ -35,6 +36,7 @@ Required path variables for wrappers:
 
 - `LINGBOT_VLA_ROOT`
 - `ROBOTWIN_ROOT`
+- `LEROBOT_V2_ROOT` and `LEROBOT_V2_ENV` for v2.1 conversion and LingBot data loading
 - `QWEN3VL_PATH`
 - `CONDA_SH`
 - `TRAIN_MANIFEST` and `COMPETITION_CONFIG` for training
@@ -46,6 +48,7 @@ Required path variables for wrappers:
 - Before training, produce a data audit with exactly 50 tasks and 50 clean episodes per task.
 - Verify camera keys, state/action dimensions, episode lengths, NaN/Inf counts, timestamp alignment, and normalization-stat provenance.
 - Hash the manifest and normalization statistics; record both in the experiment registry or run metadata.
+- Never use the released `assets/norm_stats/robotwin.json` for a scored model; it was produced by the upstream clean-plus-randomized recipe. Recompute statistics from the exact clean-only training manifest.
 - Do not modify or regenerate source demonstrations in place.
 
 ## Experiment protocol
