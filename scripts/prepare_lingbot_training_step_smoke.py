@@ -104,8 +104,9 @@ def set_nested(mapping: dict[str, Any], path: tuple[str, ...], value: Any) -> No
         if key not in current or not isinstance(current[key], dict):
             raise KeyError(f"Upstream config has no mapping at {'.'.join(path)}")
         current = current[key]
-    if path[-1] not in current:
-        raise KeyError(f"Upstream config has no leaf {'.'.join(path)}")
+    # Some TrainingArguments fields are supplied by dataclass defaults and are
+    # intentionally absent from the upstream YAML. The exact leaf whitelist is
+    # enforced before this function, so materializing such a field is safe.
     current[path[-1]] = value
 
 
