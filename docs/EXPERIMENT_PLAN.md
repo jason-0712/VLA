@@ -1,6 +1,6 @@
 # Experiment Plan
 
-Last updated: 2026-10-02
+Last updated: 2026-10-03
 
 ## 1. Goal and research question
 
@@ -89,10 +89,15 @@ official fused MoE path produced finite, decomposable losses and required about
 repeat jitter to the `robby_moe_forward` fast inference kernel. No optimizer,
 backward pass, or checkpoint write occurred.
 
-The next sub-gate is the complete official auxiliary depth/video teacher-target
-forward. After that, execute one minimal backward/optimizer step and export/reload
-a checkpoint. Do not call Phase 1 complete or start training until those checks
-pass.
+The complete official auxiliary depth/video teacher-target forward passed on
+2026-10-03. Current depth, future depth, future DINO patch, and current DINO
+patch targets were finite and shape-matched to policy predictions; all weighted
+loss terms were active. No optimizer, backward pass, or checkpoint write
+occurred.
+
+The next sub-gate is one minimal backward/optimizer step followed by checkpoint
+export and strict reload. Do not call Phase 1 complete or start training until
+that check passes.
 
 Gate: one-batch official loss and checkpoint export/reload pass; no randomized
 path in the training manifest.

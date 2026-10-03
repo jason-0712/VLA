@@ -152,8 +152,57 @@ SHA256 5324a41a1ebcc10a3a67697c327af00a3cfc51d6ede2cdcbe39dffbf9b975384
 ```
 
 This fallback is diagnostic, not the reference configuration. The core smoke
-does not validate the auxiliary teacher losses, gradients, optimizer state, or
-checkpoint export. Those remain the next open-loop sub-gates.
+did not validate the auxiliary teacher losses, gradients, optimizer state, or
+checkpoint export. The following sub-gate covers the auxiliary forward only.
+
+### Complete auxiliary-teacher FP32 forward/loss smoke
+
+The complete auxiliary forward sub-gate passed on 2026-10-03 using
+`scripts/verify_lingbot_auxiliary_forward_loss.sh` on GPU 2, an 80 GiB H100.
+Only teacher asset paths, the visualization directory, `use_compile=false`, and
+`image_augment=false` differed from the pinned training configuration. The
+policy remained in train mode and FP32; frozen teacher target generation used
+the official BF16 autocast path.
+
+Validated targets and predictions:
+
+- current and future LingBot-Depth features: `[1,256,1024]`
+- current and future DINO-Video patch features: `[1,256,1024]`
+- policy parameters: 6,375,906,359 FP32 parameters
+- frozen teacher parameters: 732,208,426 total across MoGe, MoRGBD, and DINO-Video
+- all targets/predictions finite and exactly shape-matched
+
+Loss decomposition:
+
+- VLA: `0.2695782185`
+- current depth: `0.0125776147`
+- future depth: `0.0130076967`
+- current-plus-future video: `0.0031229425`
+- sequence-wise: `0.0010836312`
+- router z-loss: `0.0000303420`
+- total: `0.2994004786`
+
+Memory and timing from the final repeat:
+
+- allocated after policy and all teachers: 28,003,341,824 bytes (26.08 GiB)
+- peak allocation: 28,614,363,648 bytes (26.65 GiB)
+- target generation: 1.712 seconds
+- complete loss forward: 0.419 seconds
+
+The timing is a functional-smoke measurement after host and CUDA kernel caches
+had already been warmed by an earlier successful run; it is not a training
+throughput benchmark. The immutable final audit is:
+
+```text
+/home/hanyu/lingbot-vla-results/forward_loss_smoke/auxiliary_fp32_20261003T133407/audit.json
+SHA256 1242a1513ba657f67e3d9d9e63a0fd811bd3a5e471b93ff58adf82e93d372e33
+```
+
+The verifier also records hashes for the clean manifest, clean-only statistics,
+all three teacher checkpoints, both upstream revisions, the source/runtime
+alignment configs, and its own source. This smoke used `torch.no_grad()` and no
+optimizer, so gradients, optimizer state, FSDP, export, and reload remain
+unvalidated.
 
 ## Reference RoboTwin simulation environment
 
@@ -246,5 +295,4 @@ pinned LingBot code deliberately supports the v2 API as a fallback. Loader
 wrappers therefore require `LEROBOT_V2_ROOT` and `LEROBOT_V2_ENV`, prepend the
 pinned source on `PYTHONPATH`, and record the imported source file and commit.
 This does not modify the LingBot or RoboTwin environments. Its use for an actual
-training optimizer path remains gated on the complete auxiliary-loss and
-backward/export checks.
+training optimizer path remains gated on the backward/export check.

@@ -151,6 +151,16 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Numerical note: fixed-input repeats with the official `robby_moe_forward` inference kernel are not bitwise deterministic. Keeping the same fused checkpoint layout but disabling only that fast kernel made all three forward losses bitwise identical, localizing the observed jitter to the fast MoE inference path or its interaction with the model. The default official kernel remains the reference path; the fallback is diagnostic only and must be recorded if used.
 - Next gate: run the complete auxiliary teacher/target forward in FP32, then one minimal backward/optimizer/checkpoint-export-and-reload check before evaluation or overfit training.
 
+## D-019 - Preserve the official auxiliary-target semantics for the baseline
+
+- Date: 2026-10-03
+- Status: accepted
+- Decision: retain the pinned recipe's complete current-depth, future-depth, future-DINO, and current-DINO alignment losses. Resolve only the teacher asset paths and output directory at runtime; keep image augmentation disabled, generate teacher targets under the official BF16 autocast path, and keep the LingBot policy in FP32.
+- Reason: the full one-batch auxiliary forward passed with finite, shape-matched targets/predictions and a loss that exactly decomposes into VLA, three weighted alignment terms, sequence-wise loss, and router z-loss. Removing or changing an auxiliary term before the clean-only baseline would confound the baseline with a method change.
+- Data-semantics note: the pinned loader queries the future observation at action-chunk offset 49, which is 0.98 seconds at the dataset's 50 FPS metadata. Both depth and DINO teachers consume camera index 0 (`camera_top`) only. No per-sample video FPS reaches the collated batch, so DINO uses the pinned config's `effective_fps: 1.0`. Preserve this behavior for the baseline; any correction is a separately justified ablation.
+- Validation boundary: this was a train-mode, no-grad forward with `use_compile=false` on one GPU. It did not validate gradients, Muon state, FSDP, checkpoint serialization, or checkpoint reload.
+- Next gate: one minimal backward/optimizer step followed by checkpoint export and strict reload. Do not start an overfit or throughput run first.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

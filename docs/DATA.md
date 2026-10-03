@@ -225,6 +225,17 @@ Full-batch audit:
 The one-task statistics are not valid for the 50-task baseline. Recompute one
 clean-only statistics file from the final 50-task manifest after acquisition.
 The teacher-free core-VLA GPU forward/loss passed using this exact batch and
-the recorded manifest/statistics hashes. The next functional gate is the
-complete official auxiliary depth/video teacher-target forward; it must still
-use this immutable clean batch and must not yet start a training run.
+the recorded manifest/statistics hashes. The complete auxiliary-teacher forward
+then passed on 2026-10-03 using the same immutable sample and hashes.
+
+For the pinned recipe, the future image is queried 49 frames after the current
+observation: 0.98 seconds according to the LeRobot metadata's 50 FPS. The
+teacher input retains three cameras in the batch, but both LingBot-Depth and
+DINO-Video explicitly slice camera index 0 (`camera_top`). The batch does not
+carry `future_video_effective_fps`, so DINO falls back to the configured
+`effective_fps: 1.0`. These are baseline provenance facts, not changes made by
+the verifier.
+
+The next functional gate is a minimal backward/optimizer step and checkpoint
+export/reload using this same clean-only data path; it must not become an
+overfit or throughput run.
