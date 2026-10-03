@@ -99,6 +99,13 @@ The next sub-gate is one minimal backward/optimizer step followed by checkpoint
 export and strict reload. Do not call Phase 1 complete or start training until
 that check passes.
 
+The E000 launcher and immutable override set are prepared for a reserved
+four-H100 window. Its resource preflight refuses GPUs with more than 1 GiB
+already allocated, so shared-server occupancy cannot turn the smoke into an
+unrecorded oversubscription experiment. E000 has not passed until the resulting
+DCP model/optimizer/extra state, HF export, and strict FP32 HF reload are all
+present in one immutable run directory.
+
 Gate: one-batch official loss and checkpoint export/reload pass; no randomized
 path in the training manifest.
 

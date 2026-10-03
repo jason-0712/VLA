@@ -161,6 +161,15 @@ Decisions are append-only. A superseding decision references the previous ID ins
 - Validation boundary: this was a train-mode, no-grad forward with `use_compile=false` on one GPU. It did not validate gradients, Muon state, FSDP, checkpoint serialization, or checkpoint reload.
 - Next gate: one minimal backward/optimizer step followed by checkpoint export and strict reload. Do not start an overfit or throughput run first.
 
+## D-020 - Require an explicit four-H100 window for the first training transaction
+
+- Date: 2026-10-03
+- Status: accepted
+- Decision: prepare E000 as a four-GPU FP32 FSDP2 transaction and make its launcher abort before creating a run if any selected GPU already uses more than 1 GiB. Do not kill, share, or opportunistically oversubscribe another user's process. Use the pinned full loss, Muon optimizer, and DCP checkpoint path; enable gradient checkpointing and disable compilation for this one-step memory gate.
+- Reason: a single free 80 GiB H100 is not a defensible full-fine-tuning target once FP32 parameters, gradients, optimizer states, activations, and frozen teachers are included. The later full baseline also needs a scheduled multi-GPU allocation rather than waiting for accidental idle capacity. Official competition compute remains a candidate only after its GPU topology, wall-time, persistent-storage, and environment restrictions are verified.
+- Checkpoint note: use upstream asynchronous HF export for E000 because it de-duplicates the final checkpoint path and is awaited at process exit. The synchronous path converts the same final checkpoint once at the step boundary and again at shutdown. The final audit still treats a missing/invalid HF checkpoint as a hard failure.
+- Fallback: if four GPUs cannot be reserved, create a separately identified two-GPU measurement with FSDP2 `enable_full_shard: true`; do not silently substitute it for E000 or the official-config throughput measurement.
+
 ## Open decisions
 
 - Organizer ruling on image augmentation and synthetic clean-frame perturbations.

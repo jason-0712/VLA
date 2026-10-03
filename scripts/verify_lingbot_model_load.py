@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Strict, single-GPU FP32 load smoke for the LingBot-VLA 2.0 base model."""
+"""Strict, single-GPU FP32 load smoke for a LingBot-VLA 2.0 checkpoint."""
 
 from __future__ import annotations
 
@@ -18,7 +18,6 @@ import yaml
 
 
 EXPECTED_LINGBOT_COMMIT = "be969b8fd117fb70550c5d4bf4bc328211b5b1b6"
-EXPECTED_BASE_REVISION = "11c703bf6a5c1f45b3b69168482da11fdbba53d7"
 EXPECTED_QWEN_REVISION = "ebb281ec70b05090aa6165b016eac8ec08e71b17"
 
 
@@ -157,7 +156,6 @@ def main() -> None:
         },
         "assets": {
             "model_path": str(model_path),
-            "base_model_revision": EXPECTED_BASE_REVISION,
             "qwen3vl_path": str(qwen_path),
             "qwen3vl_revision": EXPECTED_QWEN_REVISION,
         },
