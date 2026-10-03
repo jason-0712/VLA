@@ -11,7 +11,7 @@ Usage: scripts/train_competition.sh
 Required environment variables:
   LINGBOT_VLA_ROOT   Pinned LingBot-VLA 2.0 checkout
   LEROBOT_V2_ROOT    Pinned LeRobot v2 checkout
-  LEROBOT_V2_ENV     Python environment containing torchrun
+  LEROBOT_V2_ENV     LeRobot v2 compatibility environment layered on LingBot
   COMPETITION_CONFIG Absolute path to an immutable experiment YAML
   TRAIN_MANIFEST     Clean-only training manifest
   OUTPUT_DIR         New output directory, or an existing run with ALLOW_RESUME=1
@@ -38,7 +38,7 @@ fi
 
 [[ -d "$LINGBOT_VLA_ROOT" ]] || { echo "Missing LingBot checkout: $LINGBOT_VLA_ROOT" >&2; exit 2; }
 [[ -d "$LEROBOT_V2_ROOT" ]] || { echo "Missing LeRobot v2 checkout: $LEROBOT_V2_ROOT" >&2; exit 2; }
-[[ -x "$LEROBOT_V2_ENV/bin/torchrun" ]] || { echo "Missing torchrun: $LEROBOT_V2_ENV/bin/torchrun" >&2; exit 2; }
+[[ -x "$LEROBOT_V2_ENV/bin/python" ]] || { echo "Missing Python: $LEROBOT_V2_ENV/bin/python" >&2; exit 2; }
 [[ -f "$COMPETITION_CONFIG" ]] || { echo "Missing config: $COMPETITION_CONFIG" >&2; exit 2; }
 [[ -f "$TRAIN_MANIFEST" ]] || { echo "Missing training manifest: $TRAIN_MANIFEST" >&2; exit 2; }
 
@@ -88,7 +88,7 @@ tee_args=("$OUTPUT_DIR/train.log")
 if [[ "${ALLOW_RESUME:-0}" == "1" ]]; then
   tee_args=(-a "${tee_args[@]}")
 fi
-"$LEROBOT_V2_ENV/bin/torchrun" \
+"$LEROBOT_V2_ENV/bin/python" -m torch.distributed.run \
   --nnodes="${NNODES:-1}" \
   --nproc-per-node="$nproc_per_node" \
   --node-rank="${NODE_RANK:-0}" \

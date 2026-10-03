@@ -3,7 +3,7 @@ set -euo pipefail
 
 : "${LINGBOT_VLA_ROOT:?Set LINGBOT_VLA_ROOT to the pinned LingBot checkout}"
 : "${LEROBOT_V2_ROOT:?Set LEROBOT_V2_ROOT to the pinned LeRobot v2 checkout}"
-: "${LEROBOT_V2_ENV:?Set LEROBOT_V2_ENV to the lingbotvla environment}"
+: "${LEROBOT_V2_ENV:?Set LEROBOT_V2_ENV to the LeRobot v2 compatibility environment}"
 : "${TRAIN_MANIFEST:?Set TRAIN_MANIFEST to the audited one-task clean manifest}"
 : "${NORM_STATS_PATH:?Set NORM_STATS_PATH to its clean-only normalization statistics}"
 : "${MODEL_PATH:?Set MODEL_PATH to the base LingBot-VLA 2.0 checkpoint}"
